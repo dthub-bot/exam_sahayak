@@ -434,7 +434,8 @@
         // RENDER CHIPS BASED ON LANGUAGE
         function renderChips() {
             const t = translations[currentLang];
-            // Fix: Removed 'grp-cat' from the list to prevent null pointer error on iPhone/JS
+            
+            // Clean containers first
             ['grp-edu', 'grp-stream'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.innerHTML = '';
