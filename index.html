@@ -263,9 +263,6 @@
             <label id="stream-label">Stream / Field</label>
             <div class="chip-group" id="grp-stream"></div>
 
-            <label id="cat-label">Category</label>
-            <div class="chip-group" id="grp-cat"></div>
-
             <div style="text-align:center;">
                 <button class="btn btn-primary" onclick="showResults()">Find & Compare Exams</button>
             </div>
@@ -333,7 +330,6 @@
                 filter_title: "Select Your Details",
                 edu_label: "Education Level",
                 stream_label: "Stream / Field",
-                cat_label: "Category",
                 results_title: "Recommended Exams",
                 back_to_name: "Back to Name",
                 back_to_filters: "Back to Filters",
@@ -353,7 +349,6 @@
                     "state_psc": "State PSC",
                     "professional": "Professional (CA/CS)"
                 },
-                categories: { "general": "General", "obc": "OBC", "sc": "SC", "st": "ST", "ews": "EWS", "pwd": "PwD" },
                 fee_labels: ["General", "OBC", "EWS", "SC", "ST", "PwD"],
                 table_headers: [
                     "Exam", "Eligibility", "Min Marks", "Age Limit", "Conducted By",
@@ -368,7 +363,6 @@
                 filter_title: "अपना विवरण चुनें",
                 edu_label: "शैक्षणिक स्तर",
                 stream_label: "स्ट्रीम / क्षेत्र",
-                cat_label: "श्रेणी",
                 results_title: "अनुशंसित परीक्षाएँ",
                 back_to_name: "नाम पर वापस",
                 back_to_filters: "फ़िल्टर पर वापस",
@@ -388,7 +382,6 @@
                     "state_psc": "राज्य लोक सेवा आयोग",
                     "professional": "पेशेवर (सीए/सीएस)"
                 },
-                categories: { "general": "सामान्य", "obc": "ओबीसी", "sc": "अनुसूचित जाति", "st": "अनुसूचित जनजाति", "ews": "ईडब्ल्यूएस", "pwd": "पीडब्ल्यूडी" },
                 fee_labels: ["सामान्य", "ओबीसी", "ईडब्ल्यूएस", "अनुसूचित जाति", "अनुसूचित जनजाति", "पीडब्ल्यूडी"],
                 table_headers: [
                     "परीक्षा", "पात्रता", "न्यूनतम अंक", "आयु सीमा", "आयोजक संस्था",
@@ -403,7 +396,6 @@
                 filter_title: "तुमचा तपशील निवडा",
                 edu_label: "शैक्षणिक पातळी",
                 stream_label: "प्रवाह / क्षेत्र",
-                cat_label: "श्रेणी",
                 results_title: "शिफारस केलेल्या परीक्षा",
                 back_to_name: "नावावर परत",
                 back_to_filters: "फिल्टरवर परत",
@@ -423,7 +415,6 @@
                     "state_psc": "राज्य लोकसेवा आयोग",
                     "professional": "व्यावसायिक (सीए/सीएस)"
                 },
-                categories: { "general": "सामान्य", "obc": "ओबीसी", "sc": "अनुसूचित जाती", "st": "अनुसूचित जमाती", "ews": "ईडब्ल्यूएस", "pwd": "पीडब्ल्यूडी" },
                 fee_labels: ["सामान्य", "ओबीसी", "ईडब्ल्यूएस", "अनुसूचित जाती", "अनुसूचित जमाती", "पीडब्ल्यूडी"],
                 table_headers: [
                     "परीक्षा", "पात्रता", "किमान गुण", "वय मर्यादा", "आयोजक संस्था",
@@ -437,23 +428,27 @@
         let currentLang = 'en';
         let selectedFilters = {
             level: '12th',
-            stream: 'any',
-            cat: 'obc'
+            stream: 'any'
         };
 
         // RENDER CHIPS BASED ON LANGUAGE
         function renderChips() {
             const t = translations[currentLang];
-            ['grp-edu', 'grp-stream', 'grp-cat'].forEach(id => document.getElementById(id).innerHTML = '');
+            // Fix: Removed 'grp-cat' from the list to prevent null pointer error on iPhone/JS
+            ['grp-edu', 'grp-stream'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.innerHTML = '';
+            });
 
-            // Education Levels - REMOVED 10th
+            // Education Levels
             ['12th', 'grad', 'post_grad'].forEach(key => {
                 const chip = document.createElement('div');
                 chip.className = `chip ${selectedFilters.level === key ? 'selected' : ''}`;
                 chip.textContent = t.levels[key];
                 chip.dataset.value = key;
                 chip.onclick = () => selectChip(chip, 'level');
-                document.getElementById('grp-edu').appendChild(chip);
+                const container = document.getElementById('grp-edu');
+                if (container) container.appendChild(chip);
             });
 
             // Streams
@@ -463,17 +458,8 @@
                 chip.textContent = t.streams[key];
                 chip.dataset.value = key;
                 chip.onclick = () => selectChip(chip, 'stream');
-                document.getElementById('grp-stream').appendChild(chip);
-            });
-
-            // Categories
-            Object.keys(translations.en.categories).forEach(key => {
-                const chip = document.createElement('div');
-                chip.className = `chip ${selectedFilters.cat === key ? 'selected' : ''}`;
-                chip.textContent = t.categories[key];
-                chip.dataset.value = key;
-                chip.onclick = () => selectChip(chip, 'cat');
-                document.getElementById('grp-cat').appendChild(chip);
+                const container = document.getElementById('grp-stream');
+                if (container) container.appendChild(chip);
             });
         }
 
@@ -486,7 +472,6 @@
             document.getElementById('filter-title').textContent = t.filter_title;
             document.getElementById('edu-label').textContent = t.edu_label;
             document.getElementById('stream-label').textContent = t.stream_label;
-            document.getElementById('cat-label').textContent = t.cat_label;
             document.getElementById('results-title').textContent = t.results_title;
             document.getElementById('back-to-name').textContent = t.back_to_name;
             document.getElementById('back-to-filters').textContent = t.back_to_filters;
@@ -521,7 +506,6 @@
             const val = el.dataset.value;
             if (group === 'level') selectedFilters.level = val;
             if (group === 'stream') selectedFilters.stream = val;
-            if (group === 'cat') selectedFilters.cat = val;
         }
 
         // NAVIGATION
